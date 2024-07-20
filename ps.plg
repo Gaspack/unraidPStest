@@ -2,7 +2,8 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY name      "PowerShell">
 <!ENTITY author    "Gaston">
-<!ENTITY version   "7.4.3">
+<!ENTITY version   "7.4.4">
+<!ENTITY sha256    "5cfcc228afd3ffce536ec4541abafe97c629afcd6dc85c9a20712894bbf65adb">
 <!ENTITY launch    "Settings/&name;">
 <!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
 <!ENTITY plugin    "/boot/config/plugins/&name;">
