@@ -1,0 +1,91 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN [
+<!ENTITY name      "PowerShell">
+<!ENTITY author    "Gaston">
+<!ENTITY version   "7.4.3">
+<!ENTITY launch    "Settings/&name;">
+<!ENTITY plugdir   "/usr/local/emhttp/plugins/&name;">
+<!ENTITY plugin    "/boot/config/plugins/&name;">
+<!ENTITY pluginURL "https://raw.githubusercontent.com/x-radeon/unraid-powershell/main/PowerShell.plg">
+]>
+
+<PLUGIN name="&name;" author="&author;" version="&version;" launch="&launch;" pluginURL="&pluginURL;" min="6.9.2" support="https://forums.unraid.net/topic/135932-plugin-powershell/">
+
+<CHANGES>
+###2024-06-30
+- PowerShell Version 7.4.3 (https://github.com/PowerShell/PowerShell/releases/tag/v7.4.3)
+- Gaston
+###2024-04-28
+- PowerShell Version 7.4.2 (https://github.com/PowerShell/PowerShell/releases/tag/v7.4.2)
+
+###2024-02-19
+- PowerShell Version 7.4.1 (https://github.com/PowerShell/PowerShell/releases/tag/v7.4.1)
+
+###Older updates removed
+
+###2023-03-05
+- Added Unraid community support URL https://forums.unraid.net/topic/135932-plugin-powershell/
+
+</CHANGES>
+
+<FILE Run="/bin/bash">
+<INLINE>
+checksumverified=false
+echo "Removing Old Install"
+rm -rf /usr/bin/pwsh /opt/microsoft/powershell
+find /boot/config/plugins/PowerShell -type f -regex '.*powershell-.*-linux-x64.tar.gz' ! -iname powershell-&version;-linux-x64.tar.gz -delete
+echo "Creating Directory"
+mkdir -p /opt/microsoft/powershell/7
+if [ ! -d /boot/config/plugins/PowerShell ]
+then
+  mkdir -p /boot/config/plugins/&name;
+fi
+if echo "&sha256;  /boot/config/plugins/PowerShell/powershell-&version;-linux-x64.tar.gz" | sha256sum -c
+then
+  echo "Using already downloaded file"
+  checksumverified=true
+else
+  echo "Need to download PowerShell. Downloading Source https://github.com/PowerShell/PowerShell/releases/download/v&version;/powershell-&version;-linux-x64.tar.gz"
+  curl -L -o &plugin;/powershell-&version;-linux-x64.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v&version;/powershell-&version;-linux-x64.tar.gz
+  if echo "&sha256;  /boot/config/plugins/PowerShell/powershell-&version;-linux-x64.tar.gz" | sha256sum -c ; then checksumverified=true ; fi
+fi
+if [ $checksumverified == true ] ; then
+  echo "Untar files"
+  tar zxf &plugin;/powershell-&version;-linux-x64.tar.gz -C /opt/microsoft/powershell/7
+  echo "Set execute permissions"
+  chmod +x /opt/microsoft/powershell/7/pwsh
+  echo "Create the symbolic link that points to pwsh"
+  ln -s /opt/microsoft/powershell/7/pwsh /usr/bin/pwsh
+  echo "Finished"
+else
+  echo "Failed to verify checksum!!!"
+fi
+</INLINE>
+</FILE>
+
+<FILE Name="&plugdir;/README.md">
+<INLINE>
+**PowerShell**
+
+This Plugin allows you to install Microsoft PowerShell.
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+echo "------------------------------------"
+echo "---Uninstalling PowerShell plugin---"
+echo "------------------------------------"
+echo
+# Remove plugin related files
+rm -rf /usr/bin/pwsh /opt/microsoft/powershell
+rm -rf &plugin;
+rm -rf &plugdir;
+echo
+echo "--------------------------------------------------------"
+echo "--------------PowerShell uninstalled--------------------"
+echo "--------------------------------------------------------"
+echo
+</INLINE>
+</FILE>
+</PLUGIN>
